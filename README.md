@@ -51,6 +51,15 @@ To use a private Sourcegraph instance, set the
 `SRC_ENDPOINT` and `SRC_ACCESS_TOKEN` [environment
 variables](https://docs.sourcegraph.com/cli/explanations/env) first.
 
+### Test Code
+
+`scip-php` adds the `Test` role to all occurrences in test code. A file is
+test code if the PHPUnit configuration (`phpunit.xml`, `phpunit.dist.xml`
+or `phpunit.xml.dist`) puts it in a test suite: either PHPUnit runs it as a
+test, or it is autoloaded via `autoload-dev`, like a helper. Without a
+PHPUnit configuration declaring test suites, all files autoloaded via
+`autoload-dev` are test code.
+
 ## Contributing
 
 See the [contributing guidelines](CONTRIBUTING.md).

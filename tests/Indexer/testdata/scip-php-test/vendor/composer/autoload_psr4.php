@@ -7,6 +7,8 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Test\\Dep\\' => array($vendorDir . '/davidrjenni/scip-php-test-dep/src'),
+    'TestData\\Tests\\' => array($baseDir . '/tests'),
+    'TestData\\Bench\\' => array($baseDir . '/bench'),
     'TestData\\' => array($baseDir . '/src'),
     'TestData3\\' => array($baseDir . '/src'),
     'TestData2\\' => array($baseDir . '/src'),
