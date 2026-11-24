@@ -12,7 +12,9 @@ use ReflectionClass;
 use ReflectionFunction;
 use RuntimeException;
 use ScipPhp\File\Reader;
+use ScipPhp\PhpUnit\TestSuites;
 
+use function array_fill_keys;
 use function array_keys;
 use function array_merge;
 use function array_slice;
@@ -64,6 +66,15 @@ final class Composer
     /** @var list<non-empty-string> */
     private readonly array $projectFiles;
 
+    /**
+     * Project files that are autoloaded in development, via "autoload-dev".
+     *
+     * @var array<non-empty-string, true>
+     */
+    private readonly array $devFiles;
+
+    private readonly ?TestSuites $testSuites;
+
     private readonly ClassLoader $loader;
 
     /** @var non-empty-array<non-empty-string, array{name: non-empty-string, version: non-empty-string}> */
@@ -112,11 +123,14 @@ final class Composer
         if (is_array($json['bin'] ?? null)) {
             $bin = $this->collectPaths($json['bin']);
         }
+        $devFiles = $this->loadProjectFiles($autoloadDev);
         $this->projectFiles = array_merge(
             $bin,
             $this->loadProjectFiles($autoload),
-            $this->loadProjectFiles($autoloadDev),
+            $devFiles,
         );
+        $this->devFiles = array_fill_keys($devFiles, true);
+        $this->testSuites = TestSuites::load($projectRoot);
 
         $vendorDir = 'vendor';
         if (
@@ -320,6 +334,30 @@ final class Composer
     public function projectFiles(): array
     {
         return $this->projectFiles;
+    }
+
+    /**
+     * Whether the project file is test code.
+     *
+     * If the PHPUnit configuration declares test suites, a file is test code if PHPUnit
+     * runs it as a test, or if it is in the test suites and autoloaded via "autoload-dev",
+     * like a base test case or a helper. Otherwise, every file autoloaded via "autoload-dev"
+     * is test code: this is where Composer recommends to put the classes of the test suite,
+     * see https://getcomposer.org/doc/04-schema.md#autoload-dev.
+     *
+     * @param  non-empty-string  $filename
+     */
+    public function isTestFile(string $filename): bool
+    {
+        $isDevFile = isset($this->devFiles[$filename]);
+        if ($this->testSuites === null) {
+            return $isDevFile;
+        }
+        $realPath = realpath($filename);
+        if ($realPath === false) {
+            return false;
+        }
+        return $this->testSuites->runs($realPath) || ($isDevFile && $this->testSuites->contains($realPath));
     }
 
     /** @param  non-empty-string  $ident */

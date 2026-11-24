@@ -8,6 +8,8 @@ use Override;
 use PHPUnit\Framework\TestCase;
 use ScipPhp\Composer\Composer;
 
+use function array_filter;
+use function array_values;
 use function count;
 use function explode;
 use function implode;
@@ -80,6 +82,16 @@ final class ComposerTest extends TestCase
         self::assertStringEndsWith(self::join($root, 'src', 'file2.php'), $files[2]);
         self::assertStringEndsWith(self::join($root, 'src', 'ClassA.php'), $files[3]);
         self::assertStringEndsWith(self::join($root, 'tests', 'ClassATestCase.php'), $files[4]);
+    }
+
+    public function testIsTestFile(): void
+    {
+        // Without a PHPUnit configuration, the files autoloaded via autoload-dev are test files.
+        $files = $this->composer->projectFiles();
+        $testFiles = array_values(array_filter($files, $this->composer->isTestFile(...)));
+
+        self::assertCount(1, $testFiles);
+        self::assertStringEndsWith(self::join('testdata', 'tests', 'ClassATestCase.php'), $testFiles[0]);
     }
 
     public function testIsDependency(): void

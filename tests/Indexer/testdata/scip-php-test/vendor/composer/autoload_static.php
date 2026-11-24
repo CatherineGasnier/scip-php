@@ -15,6 +15,8 @@ class ComposerStaticInit1c1309d7d1898d3f8b5e7cf0cd8c605a
         'T' => 
         array (
             'Test\\Dep\\' => 9,
+            'TestData\\Tests\\' => 15,
+            'TestData\\Bench\\' => 15,
             'TestData\\' => 9,
             'TestData3\\' => 10,
             'TestData2\\' => 10,
@@ -25,6 +27,14 @@ class ComposerStaticInit1c1309d7d1898d3f8b5e7cf0cd8c605a
         'Test\\Dep\\' => 
         array (
             0 => __DIR__ . '/..' . '/davidrjenni/scip-php-test-dep/src',
+        ),
+        'TestData\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/tests',
+        ),
+        'TestData\\Bench\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/bench',
         ),
         'TestData\\' => 
         array (

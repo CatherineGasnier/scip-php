@@ -65,7 +65,8 @@ final readonly class Indexer
         $documents = [];
         $extSymbols = [];
         foreach ($projectFiles as $filename) {
-            $indexer = new DocIndexer($this->composer, $this->namer, $this->types);
+            $isTestFile = $this->composer->isTestFile($filename);
+            $indexer = new DocIndexer($this->composer, $this->namer, $this->types, $isTestFile);
             $this->parser->traverse($filename, $indexer, $indexer->index(...));
             $documents[] = new Document([
                 'language'          => Language::PHP,

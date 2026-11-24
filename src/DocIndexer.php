@@ -64,6 +64,7 @@ final class DocIndexer
         private readonly Composer $composer,
         private readonly SymbolNamer $namer,
         private readonly Types $types,
+        private readonly bool $isTestFile,
     ) {
         $this->docGenerator = new DocGenerator();
         $this->docCommentParser = new DocCommentParser();
@@ -205,7 +206,7 @@ final class DocIndexer
         $this->occurrences[] = new Occurrence([
             'range'        => $pos->pos($posNode),
             'symbol'       => $symbol,
-            'symbol_roles' => SymbolRole::Definition,
+            'symbol_roles' => $this->roles(SymbolRole::Definition),
             'syntax_kind'  => $kind,
         ]);
     }
@@ -246,7 +247,7 @@ final class DocIndexer
         $this->occurrences[] = new Occurrence([
             'range'        => $pos,
             'symbol'       => $symbol,
-            'symbol_roles' => SymbolRole::Definition,
+            'symbol_roles' => $this->roles(SymbolRole::Definition),
             'syntax_kind'  => $kind,
         ]);
     }
@@ -272,8 +273,14 @@ final class DocIndexer
         $this->occurrences[] = new Occurrence([
             'range'        => $pos->pos($posNode),
             'symbol'       => $symbol,
-            'symbol_roles' => $role,
+            'symbol_roles' => $this->roles($role),
             'syntax_kind'  => $kind,
         ]);
+    }
+
+    /** Adds the Test role to the given roles of an occurrence in a test file. */
+    private function roles(int $roles): int
+    {
+        return $this->isTestFile ? $roles | SymbolRole::Test : $roles;
     }
 }
